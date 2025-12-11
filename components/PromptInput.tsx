@@ -175,29 +175,29 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
     <div 
       className={`
         relative w-full transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] flex justify-center
-        ${isExpanded ? 'max-w-[90%] md:max-w-2xl' : 'max-w-[90%] md:max-w-[640px]'}
+        ${isExpanded ? 'max-w-[92%] md:max-w-2xl' : 'max-w-[92%] md:max-w-[640px]'}
       `}
     >
-      <div className="w-full bg-[#fcfbf9] dark:bg-[#18181b]/95 backdrop-blur-xl rounded-[26px] shadow-lg dark:shadow-black/50 border border-white/60 dark:border-white/5 p-2 md:p-3 transition-all duration-300 ring-1 ring-black/5 focus-within:ring-black/10 focus-within:shadow-xl dark:ring-white/5 dark:focus-within:ring-white/10 group">
+      <div className="w-full bg-[#fcfbf9] dark:bg-[#18181b]/95 backdrop-blur-xl rounded-[22px] sm:rounded-[26px] shadow-lg dark:shadow-black/50 border border-white/60 dark:border-white/5 p-1.5 sm:p-2 md:p-3 transition-all duration-300 ring-1 ring-black/5 focus-within:ring-black/10 focus-within:shadow-xl dark:ring-white/5 dark:focus-within:ring-white/10 group">
         <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={isListening ? "Listening..." : `${PREFIX}${typingSuffix}`}
-          className="w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 text-[15px] sm:text-[16px] placeholder-gray-400 dark:placeholder-gray-500 resize-none overflow-hidden min-h-[24px] py-1 px-1 sm:px-2 leading-relaxed"
+          className="w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 text-[14px] sm:text-[15px] md:text-[16px] placeholder-gray-400 dark:placeholder-gray-500 placeholder:text-[13px] sm:placeholder:text-[14px] resize-none overflow-hidden min-h-[20px] sm:min-h-[24px] py-1 px-2 leading-relaxed"
           rows={1}
         />
         
-        <div className="flex items-center justify-between mt-2 px-1 relative">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between mt-1.5 sm:mt-2 px-0.5 sm:px-1 relative">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="relative" ref={menuRef}>
               <Tooltip content="Add Context" position="top" disabled={isPlusMenuOpen}>
                 <button 
                   onClick={() => setIsPlusMenuOpen(!isPlusMenuOpen)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 border border-transparent ${isPlusMenuOpen ? 'bg-gray-100 dark:bg-white/10 rotate-45 text-gray-900 dark:text-white' : 'bg-gray-100/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'}`}
+                  className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition-all duration-200 border border-transparent ${isPlusMenuOpen ? 'bg-gray-100 dark:bg-white/10 rotate-45 text-gray-900 dark:text-white' : 'bg-gray-100/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'}`}
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </Tooltip>
 
@@ -291,13 +291,13 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
               <button 
                 onClick={toggleListening}
                 className={`
-                  w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300
+                  w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition-all duration-300
                   ${isListening 
                     ? 'bg-red-500 text-white animate-pulse' 
                     : 'hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400'}
                 `}
               >
-                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                {isListening ? <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
               </button>
             </Tooltip>
             
@@ -306,13 +306,13 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
                 onClick={handleSubmit}
                 disabled={!input.trim() || isLoading}
                 className={`
-                  w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200
+                  w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition-all duration-200
                   ${input.trim() 
                     ? 'bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-black dark:hover:bg-gray-200 transform hover:scale-105 shadow-sm' 
                     : 'bg-gray-200 text-gray-400 dark:bg-white/10 dark:text-gray-600 cursor-not-allowed'}
                 `}
               >
-                <ArrowUp className="w-4 h-4" />
+                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </Tooltip>
           </div>
