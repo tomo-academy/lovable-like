@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSettings }) => {
   return (
-    <header className="absolute top-0 left-0 right-0 p-3 md:p-4 flex justify-between items-center z-30 pointer-events-none">
+    <header className="absolute top-0 left-0 right-0 p-2.5 md:p-4 flex justify-between items-center z-30 pointer-events-none">
       <div className="flex items-center gap-3 pointer-events-auto">
         <Tooltip content="Toggle Sidebar" position="bottom" delay={500}>
           <button 

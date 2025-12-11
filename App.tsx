@@ -168,8 +168,8 @@ const App: React.FC = () => {
 
         <main className="flex-1 relative flex flex-col w-full overflow-hidden min-h-0">
           {/* Chat Area - Scrollable */}
-          <div className={`flex-1 overflow-y-auto w-full scroll-smooth overscroll-contain webkit-overflow-scrolling-touch ${hasStarted ? 'pt-2 sm:pt-4 pb-2 sm:pb-4' : ''}`}>
-            <div className={`max-w-[92%] sm:max-w-[90%] md:max-w-2xl mx-auto w-full ${hasStarted ? 'pb-[140px] sm:pb-[180px]' : ''}`}>
+          <div className={`flex-1 overflow-y-auto w-full scroll-smooth overscroll-contain webkit-overflow-scrolling-touch ${hasStarted ? 'pt-3 sm:pt-4 pb-2 sm:pb-4' : ''}`}>
+            <div className={`max-w-[92%] sm:max-w-[90%] md:max-w-2xl mx-auto w-full ${hasStarted ? 'pb-[130px] sm:pb-[170px]' : ''}`}>
               {messages.map(msg => (
                 <ChatMessage key={msg.id} message={msg} />
               ))}
@@ -190,7 +190,7 @@ const App: React.FC = () => {
               w-full flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]
               ${hasStarted 
                 ? 'fixed bottom-0 left-0 right-0 p-2 pb-4 sm:p-4 sm:pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent dark:from-[#050505] dark:via-[#050505]/95' 
-                : 'absolute top-[45%] sm:top-[42%] md:top-[45%] left-0 right-0 -translate-y-1/2 px-3 sm:px-4 z-20'}
+                : 'absolute top-1/2 left-0 right-0 -translate-y-1/2 px-3 sm:px-4 z-20'}
             `}
           >
             {/* Wrapper to re-enable pointer events for the input container */}
@@ -202,10 +202,10 @@ const App: React.FC = () => {
                {/* Hero Title */}
               <h1 
                 className={`
-                  text-center font-bold text-gray-900 dark:text-white mb-4 sm:mb-8 transition-all duration-500
+                  text-center font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 transition-all duration-500
                   ${hasStarted 
                     ? 'opacity-0 translate-y-4 pointer-events-none absolute' 
-                    : 'text-[26px] leading-[1.15] sm:text-3xl md:text-[40px] opacity-100 translate-y-0 px-3 sm:px-4 tracking-tight drop-shadow-sm'}
+                    : 'text-[28px] leading-[1.2] sm:text-3xl md:text-[40px] opacity-100 translate-y-0 px-4 sm:px-4 tracking-tight drop-shadow-sm max-w-[90%] mx-auto'}
                 `}
               >
                 Ready to build, Kamesh?

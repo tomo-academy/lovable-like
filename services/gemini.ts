@@ -8,8 +8,22 @@ export type AIMode = 'gemini' | 'workflow' | 'hybrid';
 
 // Check if message contains email-related keywords
 const isEmailRequest = (message: string): boolean => {
-  const emailKeywords = ['send email', 'email to', 'mail to', 'send mail', 'notify', 'email notification'];
-  return emailKeywords.some(keyword => message.toLowerCase().includes(keyword));
+  const emailKeywords = [
+    'send email', 'email to', 'mail to', 'send mail', 
+    'notify', 'email notification', 'send an email',
+    'compose email', 'write email', 'draft email',
+    '@', // Check for email addresses
+  ];
+  const lowerMessage = message.toLowerCase();
+  
+  // Check for keywords
+  const hasKeyword = emailKeywords.some(keyword => lowerMessage.includes(keyword));
+  
+  // Check for email pattern
+  const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
+  const hasEmailAddress = emailPattern.test(message);
+  
+  return hasKeyword || hasEmailAddress;
 };
 
 export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid'): Promise<string> => {
@@ -37,7 +51,7 @@ export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
     const response = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them. If users ask about sending emails, let them know that email functionality is available through the workflow integration.",
+      systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them. For email sending requests, guide users to use natural language like 'Send email to john@example.com with subject X and body Y' - the system will automatically handle it through workflow integration.",
     });
     
     return response.response.text() || "I couldn't generate a response.";
