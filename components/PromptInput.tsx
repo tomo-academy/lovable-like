@@ -8,11 +8,12 @@ interface PromptInputProps {
   isExpanded: boolean;
 }
 
-const PLACEHOLDERS = [
-  "Ask Lovable to create a prototype...",
-  "Ask Lovable to debug...",
-  "Ask Lovable to write a component...",
-  "Ask Lovable to explain a concept..."
+const PREFIX = "Ask Lovable to ";
+const SUFFIXES = [
+  "create a prototype...",
+  "debug...",
+  "write a component...",
+  "explain a concept..."
 ];
 
 export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isExpanded }) => {
@@ -23,7 +24,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
   const [selectedTheme, setSelectedTheme] = useState('Modern');
   
   // Typing effect state
-  const [placeholderText, setPlaceholderText] = useState('');
+  const [typingSuffix, setTypingSuffix] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   
@@ -33,30 +34,30 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
 
   // Typing effect logic
   useEffect(() => {
-    const currentPhrase = PLACEHOLDERS[phraseIndex];
+    const currentSuffix = SUFFIXES[phraseIndex];
     const typeSpeed = isDeleting ? 30 : 50; // Speed of typing/deleting
     const pauseTime = 2000; // Pause after full phrase
 
     const timer = setTimeout(() => {
-      if (!isDeleting && placeholderText === currentPhrase) {
+      if (!isDeleting && typingSuffix === currentSuffix) {
         // Finished typing, wait before deleting
         setTimeout(() => setIsDeleting(true), pauseTime);
-      } else if (isDeleting && placeholderText === '') {
+      } else if (isDeleting && typingSuffix === '') {
         // Finished deleting, move to next phrase
         setIsDeleting(false);
-        setPhraseIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
+        setPhraseIndex((prev) => (prev + 1) % SUFFIXES.length);
       } else {
         // Typing or Deleting characters
-        setPlaceholderText(current => 
+        setTypingSuffix(current => 
           isDeleting 
             ? current.slice(0, -1) 
-            : currentPhrase.slice(0, current.length + 1)
+            : currentSuffix.slice(0, current.length + 1)
         );
       }
     }, typeSpeed);
 
     return () => clearTimeout(timer);
-  }, [placeholderText, isDeleting, phraseIndex]);
+  }, [typingSuffix, isDeleting, phraseIndex]);
 
 
   // Close menus when clicking outside
@@ -114,7 +115,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholderText}
+          placeholder={`${PREFIX}${typingSuffix}`}
           className="w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 text-[16px] md:text-[16px] placeholder-gray-400 dark:placeholder-gray-500 resize-none overflow-hidden min-h-[24px] py-1 px-2 leading-relaxed"
           rows={1}
         />
