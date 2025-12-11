@@ -1,19 +1,48 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { sendToWorkflow } from './workflow';
 
 const apiKey = import.meta.env.VITE_API_KEY || '';
 const ai = new GoogleGenerativeAI(apiKey);
 
-export const sendMessageToGemini = async (prompt: string): Promise<string> => {
+export type AIMode = 'gemini' | 'workflow' | 'hybrid';
+
+// Check if message contains email-related keywords
+const isEmailRequest = (message: string): boolean => {
+  const emailKeywords = ['send email', 'email to', 'mail to', 'send mail', 'notify', 'email notification'];
+  return emailKeywords.some(keyword => message.toLowerCase().includes(keyword));
+};
+
+export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid'): Promise<string> => {
   try {
+    // If mode is workflow or it's an email request, use workflow
+    if (mode === 'workflow' || (mode === 'hybrid' && isEmailRequest(prompt))) {
+      try {
+        const workflowResponse = await sendToWorkflow(prompt);
+        
+        if (workflowResponse.emailSent && workflowResponse.emailDetails) {
+          return `${workflowResponse.response}\n\n✅ Email sent successfully to ${workflowResponse.emailDetails.to}`;
+        }
+        
+        return workflowResponse.response;
+      } catch (workflowError) {
+        console.error('Workflow error, falling back to Gemini:', workflowError);
+        if (mode === 'workflow') {
+          return `⚠️ Workflow error: ${workflowError instanceof Error ? workflowError.message : 'Unknown error'}`;
+        }
+        // Fall through to Gemini in hybrid mode
+      }
+    }
+    
+    // Use Gemini AI
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
     const response = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them.",
+      systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them. If users ask about sending emails, let them know that email functionality is available through the workflow integration.",
     });
     
     return response.response.text() || "I couldn't generate a response.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("AI Error:", error);
     return "Sorry, I encountered an error while processing your request.";
   }
 };

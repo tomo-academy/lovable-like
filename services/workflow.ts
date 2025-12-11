@@ -1,0 +1,103 @@
+// n8n Workflow Service for Email and AI Processing
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/tomo-chat';
+
+// Generate session ID for workflow tracking
+const generateSessionId = (): string => {
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+};
+
+// Get or create session ID
+let sessionId = localStorage.getItem('workflowSessionId');
+if (!sessionId) {
+  sessionId = generateSessionId();
+  localStorage.setItem('workflowSessionId', sessionId);
+}
+
+export interface WorkflowResponse {
+  response: string;
+  emailSent?: boolean;
+  emailDetails?: {
+    to: string;
+    subject: string;
+    status: string;
+  };
+}
+
+/**
+ * Send message to n8n workflow for processing
+ * @param message - User message to send
+ * @returns Promise<WorkflowResponse>
+ */
+export const sendToWorkflow = async (message: string): Promise<WorkflowResponse> => {
+  try {
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: message,
+        sessionId: sessionId,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Workflow Error: Status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      response: data.response || data.aiResponse || 'Workflow completed successfully',
+      emailSent: data.emailSent,
+      emailDetails: data.emailDetails,
+    };
+  } catch (error) {
+    console.error('Workflow Error:', error);
+    
+    if (error instanceof Error) {
+      if (error.message.includes('Status: 500')) {
+        throw new Error('Workflow encountered an internal error. Check n8n execution logs.');
+      } else if (error.message.includes('Status: 404')) {
+        throw new Error('Workflow not found. Verify n8n workflow is active.');
+      } else if (error.message.includes('Status: 403')) {
+        throw new Error('Access denied. Check workflow permissions and CORS settings.');
+      } else if (error.name === 'TypeError') {
+        throw new Error('Cannot reach workflow server. Check network connection.');
+      }
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Send email via n8n workflow
+ * @param to - Recipient email
+ * @param subject - Email subject
+ * @param body - Email body
+ * @returns Promise<boolean>
+ */
+export const sendEmailViaWorkflow = async (
+  to: string,
+  subject: string,
+  body: string
+): Promise<boolean> => {
+  try {
+    const response = await sendToWorkflow(
+      `Send email to ${to} with subject "${subject}": ${body}`
+    );
+    return response.emailSent || false;
+  } catch (error) {
+    console.error('Email sending error:', error);
+    return false;
+  }
+};
+
+/**
+ * Reset workflow session
+ */
+export const resetWorkflowSession = (): void => {
+  sessionId = generateSessionId();
+  localStorage.setItem('workflowSessionId', sessionId);
+};

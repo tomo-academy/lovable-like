@@ -4,10 +4,11 @@ import { PromptInput } from './components/PromptInput';
 import { ChatMessage } from './components/ChatMessage';
 import { Sidebar } from './components/Sidebar';
 import { SettingsModal, Theme } from './components/SettingsModal';
-import { sendMessageToGemini } from './services/gemini';
+import { sendMessageToGemini, AIMode } from './services/gemini';
 import { Message } from './types';
 
 const App: React.FC = () => {
+  const [aiMode, setAiMode] = useState<AIMode>('hybrid');
   const [hasStarted, setHasStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +84,7 @@ const App: React.FC = () => {
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    const aiResponseText = await sendMessageToGemini(text);
+    const aiResponseText = await sendMessageToGemini(text, aiMode);
 
     const aiMsg: Message = {
       id: (Date.now() + 1).toString(),
