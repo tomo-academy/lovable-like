@@ -3,85 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Lovable</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
-            },
-            colors: {
-              gray: {
-                850: '#1f2937',
-                900: '#111827',
-                950: '#030712',
-              }
-            },
-            typography: (theme) => ({
-              DEFAULT: {
-                css: {
-                  color: theme('colors.gray.900'),
-                  maxWidth: 'none',
-                  h1: { fontSize: '1.5em', fontWeight: '700', marginTop: '1.5em', marginBottom: '0.8em' },
-                  h2: { fontSize: '1.25em', fontWeight: '600', marginTop: '1.2em', marginBottom: '0.6em' },
-                  p: { marginTop: '0.8em', marginBottom: '0.8em', lineHeight: '1.6' },
-                  'code::before': { content: '""' },
-                  'code::after': { content: '""' },
-                },
-              },
-              invert: {
-                css: {
-                  color: theme('colors.gray.100'),
-                  h1: { color: theme('colors.white') },
-                  h2: { color: theme('colors.white') },
-                  strong: { color: theme('colors.white') },
-                }
-              }
-            }),
-          }
-        },
-        plugins: [],
-      }
-    </script>
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
-      /* Custom scrollbar to match the clean aesthetic */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-      }
-      .dark ::-webkit-scrollbar-thumb {
-        background: #475569;
-      }
-      .dark ::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
-      }
-      .aurora-bg {
-        background: radial-gradient(circle at 50% 100%, #f472b6 0%, #a78bfa 30%, #60a5fa 60%, #ffffff 100%);
-      }
-      
-      /* Dark mode gradient utilities for inline use if needed, though Tailwind classes are preferred */
-      .mask-heart {
-        clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
-      }
-    </style>
   <script type="importmap">
 {
   "imports": {
