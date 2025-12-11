@@ -1,27 +1,13 @@
-// n8n Workflow Service for Email and AI Processing
+// n8n Workflow Service for Email Processing
 // Connect directly to n8n webhook (CORS must be configured in n8n)
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/tomo-chat';
-
-// Generate session ID for workflow tracking
-const generateSessionId = (): string => {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-};
-
-// Get or create session ID
-let sessionId = localStorage.getItem('workflowSessionId');
-if (!sessionId) {
-  sessionId = generateSessionId();
-  localStorage.setItem('workflowSessionId', sessionId);
-}
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender';
 
 export interface WorkflowResponse {
-  response: string;
-  emailSent?: boolean;
-  emailDetails?: {
-    to: string;
-    subject: string;
-    status: string;
-  };
+  output: string;
+  timestamp?: string;
+  status?: string;
+  recipient?: string;
+  subject?: string;
 }
 
 /**
@@ -32,7 +18,7 @@ export interface WorkflowResponse {
 export const sendToWorkflow = async (message: string): Promise<WorkflowResponse> => {
   try {
     console.log('Sending to workflow:', WEBHOOK_URL);
-    console.log('Payload:', { chatInput: message, sessionId, action: 'sendMessage' });
+    console.log('Payload:', { chatInput: message });
     
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
@@ -41,9 +27,7 @@ export const sendToWorkflow = async (message: string): Promise<WorkflowResponse>
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        chatInput: message,
-        sessionId: sessionId,
-        action: 'sendMessage'
+        chatInput: message
       }),
     });
 
@@ -72,13 +56,13 @@ export const sendToWorkflow = async (message: string): Promise<WorkflowResponse>
     const data = JSON.parse(responseText);
     console.log('Parsed data:', data);
     
-    // Handle different response formats
-    const responseMessage = data.output || data.message || data.response || data.aiResponse || 'Workflow completed successfully';
-    
+    // Return the workflow response
     return {
-      response: responseMessage,
-      emailSent: data.emailSent,
-      emailDetails: data.emailDetails,
+      output: data.output || data.message || 'Email sent successfully',
+      timestamp: data.timestamp,
+      status: data.status,
+      recipient: data.recipient,
+      subject: data.subject,
     };
   } catch (error) {
     console.error('Workflow Error:', error);
@@ -113,19 +97,11 @@ export const sendEmailViaWorkflow = async (
 ): Promise<boolean> => {
   try {
     const response = await sendToWorkflow(
-      `Send email to ${to} with subject "${subject}": ${body}`
+      `Send email to ${to} with subject "${subject}" and body ${body}`
     );
-    return response.emailSent || false;
+    return response.status === 'sent';
   } catch (error) {
     console.error('Email sending error:', error);
     return false;
   }
-};
-
-/**
- * Reset workflow session
- */
-export const resetWorkflowSession = (): void => {
-  sessionId = generateSessionId();
-  localStorage.setItem('workflowSessionId', sessionId);
 };

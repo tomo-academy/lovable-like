@@ -19,11 +19,11 @@ export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid
       try {
         const workflowResponse = await sendToWorkflow(prompt);
         
-        if (workflowResponse.emailSent && workflowResponse.emailDetails) {
-          return `${workflowResponse.response}\n\n✅ Email sent successfully to ${workflowResponse.emailDetails.to}`;
+        if (workflowResponse.status === 'sent' && workflowResponse.recipient) {
+          return `${workflowResponse.output}\n\n✅ Email sent successfully to ${workflowResponse.recipient}${workflowResponse.subject ? `\nSubject: ${workflowResponse.subject}` : ''}`;
         }
         
-        return workflowResponse.response;
+        return workflowResponse.output;
       } catch (workflowError) {
         console.error('Workflow error, falling back to Gemini:', workflowError);
         if (mode === 'workflow') {

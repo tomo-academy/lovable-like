@@ -1,130 +1,99 @@
-# n8n Workflow Integration Guide
+# n8n Email Workflow Integration Guide
 
 ## Overview
 
-This project integrates with n8n workflows to provide email sending capabilities and custom automation features alongside Gemini AI responses.
+This project integrates with a simplified n8n workflow for email sending. The workflow uses AI to extract recipient, subject, and body from natural language requests and sends emails via Gmail.
 
-## Setup Instructions
+## Current Workflow Configuration
 
-### 1. Configure n8n Workflow
+### Webhook Details
 
-#### Import the Template
+**URL:** `https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender`
 
-1. Open n8n
-2. Click on "Workflows" → "Import from File"
-3. Upload `n8n-workflow-template.json` from this directory
-4. The workflow will be imported with three nodes:
-   - **Webhook Trigger**: Receives messages from the app
-   - **AI Logic**: Processes messages and handles email sending
-   - **Respond to Webhook**: Returns responses with CORS headers
+**Method:** POST
 
-#### Customize the AI Logic Node
-
-Replace the demo code with your actual email service integration:
-
-```javascript
-// Extract data from webhook
-const message = $input.first().json.body.message;
-const sessionId = $input.first().json.body.sessionId;
-
-// Check if it's an email request
-const isEmailRequest = message.toLowerCase().includes('send email') || 
-                       message.toLowerCase().includes('email to');
-
-if (isEmailRequest) {
-  // Extract email details (you can improve this parsing)
-  const emailRegex = /email to ([^\s]+)/i;
-  const match = message.match(emailRegex);
-  
-  if (match) {
-    const recipient = match[1];
-    
-    // TODO: Add your email sending logic here
-    // Example with Gmail node or SendGrid:
-    // - Connect to your email service
-    // - Parse subject and body from message
-    // - Send email
-    
-    return {
-      response: `Email sent successfully to ${recipient}`,
-      emailSent: true,
-      emailDetails: {
-        to: recipient,
-        subject: "Message from Lovable App",
-        status: "sent"
-      }
-    };
-  }
+**Request Format:**
+```json
+{
+  "chatInput": "Send email to john@example.com with subject Meeting Tomorrow and body Let's discuss the project at 3pm"
 }
-
-// Default AI response
-return {
-  response: "I understand your request. How else can I help you?",
-  emailSent: false
-};
 ```
 
-### 2. Configure Email Service
+**Alternative field names supported:** `chatInput`, `message`, or `text`
 
-You can integrate various email services in n8n:
+### Workflow Features
 
-#### Option A: Gmail
+- ✅ Standard webhook trigger (no chat/conversation interface)
+- ✅ No session tracking or conversation memory needed
+- ✅ AI-powered extraction of recipient, subject, and body from natural language
+- ✅ Immediate email processing without conversation context
+- ✅ Simplified input validation (only requires chatInput field)
 
-1. Add a **Gmail** node after AI Logic
-2. Connect your Gmail account
-3. Configure recipient, subject, and body from the message
-
-#### Option B: SendGrid
-
-1. Add an **HTTP Request** node
-2. Configure SendGrid API endpoint
-3. Add your API key in headers
-4. Format the email payload
-
-#### Option C: Custom SMTP
-
-1. Add an **Email Send** node
-2. Configure SMTP settings
-3. Map message data to email fields
-
-### 3. Enable CORS
-
-The template already includes CORS headers in the "Respond to Webhook" node:
+### Response Format
 
 ```json
 {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Content-Type": "application/json"
+  "output": "Email sent confirmation message",
+  "timestamp": "2024-01-10T12:34:56.789Z",
+  "status": "sent",
+  "recipient": "john@example.com",
+  "subject": "Meeting Tomorrow"
 }
 ```
 
-### 4. Activate Workflow
+## How It Works
 
-1. Click the "Active" toggle in n8n
-2. Copy the webhook URL (e.g., `https://your-instance.app.n8n.cloud/webhook/tomo-chat`)
-3. Add it to your `.env` file:
-   ```
-   VITE_N8N_WEBHOOK_URL=https://your-instance.app.n8n.cloud/webhook/tomo-chat
-   ```
+1. Your chat interface sends a natural language email request to the webhook
+2. The n8n AI agent extracts recipient, subject, and body from the message
+3. Email is sent via Gmail
+4. Response returns with confirmation and email details
 
-## Usage Modes
+### Example Usage
 
-The app supports three AI modes:
+**Request:**
+```bash
+curl -X POST https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chatInput": "Send email to john@example.com with subject Meeting Tomorrow and body Lets discuss the project at 3pm"
+  }'
+```
 
-### Hybrid Mode (Default)
+**Response:**
+```json
+{
+  "output": "Email sent successfully!",
+  "timestamp": "2024-01-10T12:34:56.789Z",
+  "status": "sent",
+  "recipient": "john@example.com",
+  "subject": "Meeting Tomorrow"
+}
+```
+
+## Integration with Your App
+
+The app automatically detects email requests and routes them to the n8n workflow. Update your `.env` file:
+
+```bash
+VITE_N8N_WEBHOOK_URL=https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender
+```
+
+### AI Modes
+
+The app supports three AI modes in the settings:
+
+**Hybrid Mode (Default)**
 - Email requests → n8n workflow
 - Other requests → Gemini AI
 - Best for most use cases
 
-### Workflow Mode
+**Workflow Mode**
 - All requests → n8n workflow
-- Use when you want full control
-- Requires workflow to handle all message types
+- Use when you want full workflow control
 
-### Gemini Mode
-- All requests → Gemini AI
+**Gemini Mode**
+- All requests → Gemini AI only
+- No email sending capability
 - Email sending not available
 - Fastest response times
 
