@@ -193,8 +193,8 @@ const App: React.FC = () => {
             className={`
               w-full flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]
               ${hasStarted 
-                ? 'fixed bottom-0 left-0 right-0 p-2 pb-4 sm:p-4 sm:pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent dark:from-[#050505] dark:via-[#050505]/95' 
-                : 'absolute top-1/2 left-0 right-0 -translate-y-1/2 px-3 sm:px-4 z-20'}
+                ? 'absolute bottom-0 left-0 right-0 p-4 pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#050505] dark:via-[#050505]/80' 
+                : 'absolute top-[42%] md:top-[45%] left-0 right-0 -translate-y-1/2 px-4 z-20'}
             `}
           >
             {/* Wrapper to re-enable pointer events for the input container */}
