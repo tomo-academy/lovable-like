@@ -1,10 +1,34 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, FunctionDeclarationSchemaType } from "@google/generative-ai";
 import { sendToWorkflow } from './workflow';
 
 const apiKey = import.meta.env.VITE_API_KEY || '';
 const ai = new GoogleGenerativeAI(apiKey);
 
 export type AIMode = 'gemini' | 'workflow' | 'hybrid';
+
+// Define email sending function for Gemini
+const sendEmailFunction = {
+  name: "send_email",
+  description: "Send an email to a recipient with a subject and body. Use this when the user wants to send an email.",
+  parameters: {
+    type: FunctionDeclarationSchemaType.OBJECT,
+    properties: {
+      recipient: {
+        type: FunctionDeclarationSchemaType.STRING,
+        description: "The email address of the recipient",
+      },
+      subject: {
+        type: FunctionDeclarationSchemaType.STRING,
+        description: "The subject line of the email",
+      },
+      body: {
+        type: FunctionDeclarationSchemaType.STRING,
+        description: "The body content of the email",
+      },
+    },
+    required: ["recipient", "subject", "body"],
+  },
+};
 
 // Check if message contains email-related keywords
 const isEmailRequest = (message: string): boolean => {
@@ -28,33 +52,59 @@ const isEmailRequest = (message: string): boolean => {
 
 export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid'): Promise<string> => {
   try {
-    // If mode is workflow or it's an email request, use workflow
-    if (mode === 'workflow' || (mode === 'hybrid' && isEmailRequest(prompt))) {
+    // If mode is workflow only, always use workflow
+    if (mode === 'workflow') {
       try {
         const workflowResponse = await sendToWorkflow(prompt);
         
-        if (workflowResponse.status === 'sent' && workflowResponse.recipient) {
-          return `${workflowResponse.output}\n\n✅ Email sent successfully to ${workflowResponse.recipient}${workflowResponse.subject ? `\nSubject: ${workflowResponse.subject}` : ''}`;
+        if (workflowResponse.success && workflowResponse.recipient_email) {
+          return `✅ ${workflowResponse.message}\n\n📧 To: ${workflowResponse.recipient_email}\n📋 Subject: ${workflowResponse.subject}\n\nYour email has been delivered with beautiful HTML formatting.`;
         }
         
-        return workflowResponse.output;
+        return workflowResponse.message;
       } catch (workflowError) {
-        console.error('Workflow error, falling back to Gemini:', workflowError);
-        if (mode === 'workflow') {
-          return `⚠️ Workflow error: ${workflowError instanceof Error ? workflowError.message : 'Unknown error'}`;
-        }
-        // Fall through to Gemini in hybrid mode
+        console.error('Workflow error:', workflowError);
+        return `${workflowError instanceof Error ? workflowError.message : '⚠️ Unknown error occurred'}`;
       }
     }
     
-    // Use Gemini AI
-    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
-    const response = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them. For email sending requests, guide users to use natural language like 'Send email to john@example.com with subject X and body Y' - the system will automatically handle it through workflow integration.",
+    // Use Gemini AI with function calling (for hybrid and gemini modes)
+    const model = ai.getGenerativeModel({ 
+      model: 'gemini-2.5-flash-lite',
+      tools: mode === 'hybrid' ? [{ functionDeclarations: [sendEmailFunction] }] : undefined,
     });
     
-    return response.response.text() || "I couldn't generate a response.";
+    const chat = model.startChat({
+      history: [],
+    });
+    
+    const result = await chat.sendMessage(prompt);
+    const response = result.response;
+    
+    // Check if Gemini wants to call the email function
+    const functionCall = response.functionCalls()?.[0];
+    
+    if (functionCall && functionCall.name === 'send_email' && mode === 'hybrid') {
+      try {
+        const { recipient, subject, body } = functionCall.args as { recipient: string; subject: string; body: string };
+        
+        // Call CodeWords API with natural language
+        const emailPrompt = `Send email to ${recipient} with subject ${subject}. ${body}`;
+        const workflowResponse = await sendToWorkflow(emailPrompt);
+        
+        if (workflowResponse.success) {
+          return `✅ Email sent successfully!\n\n📧 To: ${workflowResponse.recipient_email}\n📋 Subject: ${workflowResponse.subject}\n\nYour email has been delivered with beautiful HTML formatting.`;
+        }
+        
+        return workflowResponse.message;
+      } catch (error) {
+        console.error('Email sending error:', error);
+        return `${error instanceof Error ? error.message : '⚠️ Failed to send email'}`;
+      }
+    }
+    
+    // Return regular text response
+    return response.text() || "I couldn't generate a response.";
   } catch (error) {
     console.error("AI Error:", error);
     return "Sorry, I encountered an error while processing your request.";

@@ -1,81 +1,66 @@
-// n8n Workflow Service for Email Processing
-// Connect directly to n8n webhook (CORS must be configured in n8n)
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/email-sender';
+// CodeWords Email Service Integration
+const CODEWORDS_API_URL = 'https://runtime.codewords.ai/run/voice_text_email_sender_1616b679';
+const CODEWORDS_API_KEY = import.meta.env.VITE_CODEWORDS_API_KEY || '';
 
 export interface WorkflowResponse {
-  output: string;
-  timestamp?: string;
-  status?: string;
-  recipient?: string;
-  subject?: string;
+  success: boolean;
+  recipient_email: string;
+  subject: string;
+  message: string;
 }
 
 /**
- * Send message to n8n workflow for processing
- * @param message - User message to send
+ * Send email request to CodeWords AI service
+ * @param message - Natural language email request
  * @returns Promise<WorkflowResponse>
  */
 export const sendToWorkflow = async (message: string): Promise<WorkflowResponse> => {
   try {
-    console.log('Sending to workflow:', WEBHOOK_URL);
-    console.log('Payload:', { chatInput: message });
+    console.log('Sending to CodeWords API:', CODEWORDS_API_URL);
+    console.log('Message:', message);
     
-    const response = await fetch(WEBHOOK_URL, {
+    const response = await fetch(CODEWORDS_API_URL, {
       method: 'POST',
-      mode: 'cors',
       headers: {
+        'Authorization': `Bearer ${CODEWORDS_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        chatInput: message
+        text_message: message
       }),
     });
 
     console.log('Response status:', response.status);
     
     if (!response.ok) {
-      let errorMsg = `HTTP error! Status: ${response.status}`;
-      try {
-        const errorData = await response.json();
-        errorMsg = errorData.errorMessage || errorData.error || errorMsg;
-      } catch (e) {
-        // If we can't parse error response, use status message
-      }
+      const errorData = await response.json();
+      const errorMsg = errorData.detail || `HTTP error! Status: ${response.status}`;
       throw new Error(errorMsg);
     }
 
-    // Get raw response text first
-    const responseText = await response.text();
-    console.log('Raw response:', responseText);
+    // Parse response
+    const data = await response.json();
+    console.log('CodeWords response:', data);
     
-    if (!responseText || responseText.trim() === '') {
-      throw new Error('Empty response from workflow');
-    }
-    
-    // Parse JSON
-    const data = JSON.parse(responseText);
-    console.log('Parsed data:', data);
-    
-    // Return the workflow response
+    // Return the formatted response
     return {
-      output: data.output || data.message || 'Email sent successfully',
-      timestamp: data.timestamp,
-      status: data.status,
-      recipient: data.recipient,
-      subject: data.subject,
+      success: data.success || true,
+      recipient_email: data.recipient_email || '',
+      subject: data.subject || '',
+      message: data.message || 'Email sent successfully',
     };
   } catch (error) {
-    console.error('Workflow Error:', error);
+    console.error('CodeWords API Error:', error);
     
     if (error instanceof Error) {
-      if (error.message.includes('Status: 500')) {
-        throw new Error('Workflow encountered an internal error. Check n8n execution logs.');
+      if (error.message.includes('401')) {
+        throw new Error('🔒 Authentication error. Please check your CodeWords API key configuration.');
+      } else if (error.message.includes('rate limit')) {
+        throw new Error('⏱️ Rate limit exceeded. Please try again in a moment.');
       } else if (error.message.includes('Status: 404')) {
-        throw new Error('Workflow not found. Verify n8n workflow is active.');
-      } else if (error.message.includes('Status: 403')) {
-        throw new Error('Access denied. Check workflow permissions and CORS settings.');
+        throw new Error('API endpoint not found. Please verify the CodeWords service URL.');
       } else if (error.name === 'TypeError') {
-        throw new Error('Cannot reach workflow server. Check network connection.');
+        throw new Error('Cannot reach CodeWords API. Check network connection.');
       }
     }
     
@@ -84,7 +69,7 @@ export const sendToWorkflow = async (message: string): Promise<WorkflowResponse>
 };
 
 /**
- * Send email via n8n workflow
+ * Send email via CodeWords API
  * @param to - Recipient email
  * @param subject - Email subject
  * @param body - Email body
@@ -96,10 +81,9 @@ export const sendEmailViaWorkflow = async (
   body: string
 ): Promise<boolean> => {
   try {
-    const response = await sendToWorkflow(
-      `Send email to ${to} with subject "${subject}" and body ${body}`
-    );
-    return response.status === 'sent';
+    const message = `Send email to ${to} with subject "${subject}". ${body}`;
+    const response = await sendToWorkflow(message);
+    return response.success;
   } catch (error) {
     console.error('Email sending error:', error);
     return false;

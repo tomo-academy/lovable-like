@@ -5,8 +5,7 @@ import { ChatMessage } from './components/ChatMessage';
 import { Sidebar } from './components/Sidebar';
 import { SettingsModal, Theme } from './components/SettingsModal';
 import { sendMessageToGemini, AIMode } from './services/gemini';
-import { Message } from './types';
-
+import { Message } from './types';import { TextShimmer } from './components/ui/text-shimmer';
 const App: React.FC = () => {
   const [aiMode, setAiMode] = useState<AIMode>('hybrid');
   const [hasStarted, setHasStarted] = useState(false);
@@ -174,10 +173,15 @@ const App: React.FC = () => {
                 <ChatMessage key={msg.id} message={msg} />
               ))}
               {isLoading && (
-                 <div className="flex items-center gap-2 text-gray-400 text-sm ml-2 mt-4 pl-4">
-                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
-                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                 <div className="flex flex-col gap-3 ml-2 mt-4 pl-4">
+                   <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                   </div>
+                   <TextShimmer className="text-sm font-medium" duration={1.5}>
+                     Generating response...
+                   </TextShimmer>
                  </div>
               )}
               <div ref={messagesEndRef} />

@@ -19,6 +19,15 @@ export default {
           950: '#030712',
         }
       },
+      animation: {
+        shimmer: "shimmer var(--shimmer-duration, 2s) infinite",
+      },
+      keyframes: {
+        shimmer: {
+          "0%, 100%": { backgroundPosition: "200% 0" },
+          "50%": { backgroundPosition: "-200% 0" },
+        },
+      },
     }
   },
   plugins: [],
