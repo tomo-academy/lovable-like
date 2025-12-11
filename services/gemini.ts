@@ -72,6 +72,9 @@ export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid
     const model = ai.getGenerativeModel({ 
       model: 'gemini-2.5-flash-lite',
       tools: mode === 'hybrid' ? [{ functionDeclarations: [sendEmailFunction] }] : undefined,
+      systemInstruction: mode === 'hybrid' 
+        ? "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. You have the ability to send emails using the send_email function. When users ask about sending emails or mention email addresses, use the send_email function to help them. For other requests, provide helpful coding assistance."
+        : "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development.",
     });
     
     const chat = model.startChat({
