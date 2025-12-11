@@ -176,7 +176,7 @@ const App: React.FC = () => {
           <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white via-white/80 to-transparent"></div>
         </div>
 
-        {/* Dark Mode Background (Lovable Style) */}
+        {/* Dark Mode Background (LENZ Style) */}
         <div className="absolute inset-0 hidden dark:block bg-[#0a0a0a] overflow-hidden">
           {/* Blue Orb (Top/Left) - Brighter and more prominent */}
           <div className="absolute top-[5%] -left-[15%] w-[80%] h-[80%] bg-blue-500/25 rounded-full blur-[140px] mix-blend-screen animate-pulse-slow"></div>

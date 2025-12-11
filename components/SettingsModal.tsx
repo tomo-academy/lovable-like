@@ -181,10 +181,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, t
              {activeTab === 'account' && (
               <div className="space-y-8 max-w-4xl">
                  <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Personalize how others see and interact with you on Lovable.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Personalize how others see and interact with you on LENZ BY AJ STUDIOZ.</p>
                     
                     <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-1.5">
-                      14 edits on <span className="text-pink-500 font-bold">Lovable</span> in the last year
+                      14 edits on <span className="text-pink-500 font-bold">LENZ BY AJ STUDIOZ</span> in the last year
                     </h4>
                     
                     {/* Heatmap */}
@@ -235,7 +235,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, t
                          className="w-full bg-white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 dark:focus:ring-pink-900/10 text-gray-900 dark:text-white font-mono text-sm shadow-sm" 
                        />
                        <a href="#" className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mt-2 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">
-                          lovable.dev/@O8Pv0eguckgesgUOR0aXyYjAvLW2 <ChevronRight className="w-3 h-3" />
+                          lenz.ajstudioz.com/@profile <ChevronRight className="w-3 h-3" />
                        </a>
                     </div>
 

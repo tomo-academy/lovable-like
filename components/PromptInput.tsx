@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-const PREFIX = "Ask Lovable to ";
+const PREFIX = "Ask LENZ to ";
 const SUFFIXES = [
   "create a prototype...",
   "debug...",

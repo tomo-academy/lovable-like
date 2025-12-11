@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenSettings 
         </Tooltip>
         <div className="flex items-center gap-2 md:hidden">
           {/* Mobile Logo Only */}
-          <span className="font-bold text-base sm:text-lg tracking-tight text-gray-900 dark:text-white">Lovable</span>
+          <span className="font-bold text-base sm:text-lg tracking-tight text-gray-900 dark:text-white">LENZ BY AJ STUDIOZ</span>
         </div>
       </div>
 

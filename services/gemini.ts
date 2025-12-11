@@ -96,7 +96,7 @@ export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid
       tools: mode === 'hybrid' ? [{ functionDeclarations: [sendEmailFunction] }] : undefined,
       systemInstruction: mode === 'hybrid' 
         ? "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. You have the ability to send emails using the send_email function. IMPORTANT: When sending emails, you MUST use the EXACT email addresses that the user provides in their message. Never make up or change email addresses. If the user doesn't provide a clear recipient email address, ask them to specify it. When composing emails, write detailed, professional, and well-structured content with proper paragraphs. Include relevant context, clear explanations, and maintain a professional yet friendly tone. Make emails comprehensive and informative rather than brief. For coding requests, provide helpful assistance."
-        : "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development.",
+        : "You are LENZ, a helpful AI coding assistant by AJ STUDIOZ. You are concise, friendly, and expert in React and web development.",
     });
     
     const chat = model.startChat({

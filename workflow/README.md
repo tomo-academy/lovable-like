@@ -222,7 +222,7 @@ const match = message.match(emailPattern);
 
 if (match) {
   const to = match[1];
-  const content = match[2] || "Message from Lovable App";
+  const content = match[2] || "Message from LENZ BY AJ STUDIOZ";
   
   // Split into subject and body
   const [subject, ...bodyParts] = content.split(/[:.]/);

@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, on
                </Tooltip>
                {isOpen && (
                  <div className="ml-3 flex flex-col animate-in fade-in slide-in-from-left-2 duration-300">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white leading-none">TOMO's Lovable</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white leading-none">LENZ BY AJ STUDIOZ</span>
                  </div>
                )}
                {isOpen && <MoreHorizontal className="w-4 h-4 ml-auto text-gray-400" />}
