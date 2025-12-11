@@ -1,6 +1,6 @@
 // n8n Workflow Service for Email Processing
 // Connect directly to n8n webhook (CORS must be configured in n8n)
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender';
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/email-sender';
 
 export interface WorkflowResponse {
   output: string;

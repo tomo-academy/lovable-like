@@ -8,7 +8,9 @@ This project integrates with a simplified n8n workflow for email sending. The wo
 
 ### Webhook Details
 
-**URL:** `https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender`
+**Production URL:** `https://kamesh14151.app.n8n.cloud/webhook/email-sender`
+
+**Test URL:** `https://kamesh14151.app.n8n.cloud/webhook-test/email-sender` (always works)
 
 **Method:** POST
 
@@ -50,9 +52,18 @@ This project integrates with a simplified n8n workflow for email sending. The wo
 
 ### Example Usage
 
-**Request:**
+**Production Request:**
 ```bash
-curl -X POST https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender \
+curl -X POST https://kamesh14151.app.n8n.cloud/webhook/email-sender \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chatInput": "Send email to john@example.com with subject Meeting Tomorrow and body Lets discuss the project at 3pm"
+  }'
+```
+
+**Test Request:**
+```bash
+curl -X POST https://kamesh14151.app.n8n.cloud/webhook-test/email-sender \
   -H "Content-Type: application/json" \
   -d '{
     "chatInput": "Send email to john@example.com with subject Meeting Tomorrow and body Lets discuss the project at 3pm"
@@ -75,8 +86,20 @@ curl -X POST https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-3
 The app automatically detects email requests and routes them to the n8n workflow. Update your `.env` file:
 
 ```bash
-VITE_N8N_WEBHOOK_URL=https://kamesh14151.app.n8n.cloud/webhook/d8e46f97-de79-4b82-9fec-345a2679023f/email-sender
+# Production URL (use after workflow is activated)
+VITE_N8N_WEBHOOK_URL=https://kamesh14151.app.n8n.cloud/webhook/email-sender
+
+# Or use test URL for development
+# VITE_N8N_WEBHOOK_URL=https://kamesh14151.app.n8n.cloud/webhook-test/email-sender
 ```
+
+### Important: Activating the Workflow
+
+1. Save the workflow in n8n (Ctrl+S or Cmd+S)
+2. Click the toggle in the top-right corner to activate
+3. After activation, the production webhook URL will be registered
+4. Use `/webhook/email-sender` for production
+5. Use `/webhook-test/email-sender` for testing (always works)
 
 ### AI Modes
 
