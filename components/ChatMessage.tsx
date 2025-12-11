@@ -66,7 +66,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === 'user';
 
   return (
-    <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-8 group animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+    <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-4 sm:mb-8 group animate-in fade-in slide-in-from-bottom-2 duration-300`}>
       <div className={`max-w-[90%] lg:max-w-[85%] ${isUser ? 'ml-auto' : 'mr-auto w-full'}`}>
         <div className={`
           rounded-2xl
