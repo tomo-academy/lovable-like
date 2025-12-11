@@ -132,16 +132,19 @@ const App: React.FC = () => {
           <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-white via-white/80 to-transparent"></div>
         </div>
 
-        {/* Dark Mode Background (Exact Match) */}
-        <div className="absolute inset-0 hidden dark:block bg-[#050505] overflow-hidden">
-          {/* Blue Orb (Left/Middle) */}
-          <div className="absolute top-[10%] -left-[10%] w-[70%] h-[70%] bg-blue-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse-slow"></div>
+        {/* Dark Mode Background (Lovable Style) */}
+        <div className="absolute inset-0 hidden dark:block bg-[#0a0a0a] overflow-hidden">
+          {/* Blue Orb (Top/Left) - Brighter and more prominent */}
+          <div className="absolute top-[5%] -left-[15%] w-[80%] h-[80%] bg-blue-500/25 rounded-full blur-[140px] mix-blend-screen animate-pulse-slow"></div>
           
-          {/* Pink/Magenta Orb (Bottom/Right) */}
-          <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-pink-600/20 rounded-full blur-[130px] mix-blend-screen animate-pulse-slow delay-1000"></div>
+          {/* Pink/Magenta Orb (Bottom/Right) - More vibrant */}
+          <div className="absolute bottom-[-15%] right-[-15%] w-[85%] h-[85%] bg-pink-500/30 rounded-full blur-[150px] mix-blend-screen animate-pulse-slow delay-1000"></div>
           
-          {/* Central Glow to merge them */}
-          <div className="absolute top-[40%] left-[30%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[100px] mix-blend-screen"></div>
+          {/* Purple Central Glow - Stronger blend */}
+          <div className="absolute top-[35%] left-[25%] w-[60%] h-[60%] bg-purple-500/15 rounded-full blur-[120px] mix-blend-screen"></div>
+          
+          {/* Additional cyan accent for depth */}
+          <div className="absolute top-[50%] right-[20%] w-[40%] h-[40%] bg-cyan-500/10 rounded-full blur-[100px] mix-blend-screen animate-pulse-slow delay-2000"></div>
         </div>
       </div>
 
