@@ -1,6 +1,6 @@
 // n8n Workflow Service for Email and AI Processing
-// Use API proxy to avoid CORS issues
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || '/api/workflow';
+// Connect directly to n8n webhook (CORS must be configured in n8n)
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/tomo-chat';
 
 // Generate session ID for workflow tracking
 const generateSessionId = (): string => {

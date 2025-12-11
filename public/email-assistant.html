@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Assistant - Lovable</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            color: #ffffff;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            max-height: 900px;
+            background: rgba(10, 10, 10, 0.85);
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .avatar.bot {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #ec4899, #f59e0b);
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+        }
+
+        .message.bot .message-bubble {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+            padding: 0 8px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6366f1;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 15px;
+            padding: 8px 12px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            color: white;
+        }
+
+        .quick-replies {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-reply {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-reply:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .connection-status.connecting .status-dot {
+            background: #f59e0b;
+            animation: pulse 1.5s infinite;
+        }
+
+        .connection-status.disconnected .status-dot {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>📧 Email Assistant</h1>
+            <div class="header-actions">
+                <div class="connection-status connected" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span>Connected</span>
+                </div>
+                <button class="btn" onclick="clearChat()">Clear Chat</button>
+                <button class="btn" onclick="window.location.href='/'">← Back</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="avatar bot">🤖</div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        Hi! I'm your Email Assistant. I can help you send emails, compose messages, and manage your communications. Try asking me to send an email!
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="avatar bot">🤖</div>
+            <div class="typing-dots">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Type your message or ask me to send an email..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="send-btn" id="sendButton" onclick="sendMessage()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="quick-replies">
+                <button class="quick-reply" onclick="quickReply('Send a thank you email')">Send Thank You</button>
+                <button class="quick-reply" onclick="quickReply('Write a professional email')">Professional Email</button>
+                <button class="quick-reply" onclick="quickReply('Help me compose an email')">Compose Email</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Replace with your n8n webhook URL
+        const WEBHOOK_URL = 'https://kamesh14151.app.n8n.cloud/webhook/tomo-chat';
+        
+        // Session management
+        let sessionId = localStorage.getItem('emailAssistantSessionId');
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            localStorage.setItem('emailAssistantSessionId', sessionId);
+        }
+
+        function generateSessionId() {
+            return 'session_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.className = 'connection-status ' + status;
+            
+            switch(status) {
+                case 'connected':
+                    statusElement.innerHTML = '<span class="status-dot"></span><span>Connected</span>';
+                    break;
+                case 'connecting':
+                    statusElement.innerHTML = '<span class="status-dot"></span><span>Connecting...</span>';
+                    break;
+                case 'disconnected':
+                    statusElement.innerHTML = '<span class="status-dot"></span><span>Disconnected</span>';
+                    break;
+            }
+        }
+
+        async function sendMessageToWebhook(message) {
+            updateConnectionStatus('connecting');
+            
+            try {
+                console.log('Sending to:', WEBHOOK_URL);
+                console.log('Payload:', { chatInput: message, sessionId: sessionId, action: 'sendMessage' });
+                
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chatInput: message,
+                        sessionId: sessionId,
+                        action: 'sendMessage'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    let errorMsg = `HTTP error! Status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.errorMessage || errorData.error || errorMsg;
+                    } catch (e) {}
+                    throw new Error(errorMsg);
+                }
+                
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                if (!responseText || responseText.trim() === '') {
+                    updateConnectionStatus('disconnected');
+                    return "🔧 Error: Empty response. Please check your n8n workflow.";
+                }
+                
+                const data = JSON.parse(responseText);
+                console.log('Parsed data:', data);
+                
+                updateConnectionStatus('connected');
+                
+                return data.output || data.message || data.response || data.aiResponse || 'Workflow completed';
+            } catch (error) {
+                console.error('Error:', error);
+                updateConnectionStatus('disconnected');
+                
+                if (error.message.includes('Status: 500')) {
+                    return "🔧 Workflow Error: Check your n8n execution logs.";
+                } else if (error.message.includes('Status: 404')) {
+                    return "🔍 Webhook Not Found: Verify your n8n workflow is ACTIVE.";
+                } else if (error.message.includes('Status: 403')) {
+                    return "🚫 Access Denied: Check CORS settings in n8n.";
+                } else if (error.name === 'TypeError') {
+                    return "❌ Network Error: Cannot reach n8n. Check workflow URL.";
+                }
+                
+                return `⚠️ Error: ${error.message}`;
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="avatar ${sender}">${sender === 'bot' ? '🤖' : '👤'}</div>
+                <div class="message-content">
+                    <div class="message-bubble">${text}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            sendButton.disabled = true;
+            addMessage(message, 'user');
+            input.value = '';
+            
+            showTypingIndicator();
+            const response = await sendMessageToWebhook(message);
+            hideTypingIndicator();
+            
+            addMessage(response, 'bot');
+            sendButton.disabled = false;
+        }
+
+        function quickReply(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('active');
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('active');
+        }
+
+        function clearChat() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="message bot">
+                    <div class="avatar bot">🤖</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Chat cleared! How can I assist you today?
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            `;
+            sessionId = generateSessionId();
+            localStorage.setItem('emailAssistantSessionId', sessionId);
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('chatInput').focus();
+        });
+    </script>
+</body>
+</html>
