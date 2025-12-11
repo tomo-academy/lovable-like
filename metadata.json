@@ -1,0 +1,7 @@
+{
+  "name": "Lovable Clone",
+  "description": "A high-fidelity clone of the Lovable AI interface connected to Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
