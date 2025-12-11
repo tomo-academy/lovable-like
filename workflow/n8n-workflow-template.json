@@ -1,16 +1,19 @@
 {
-  "name": "Tomo Chat Workflow",
+  "name": "Tomo Chat Workflow with CORS",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "tomo-chat",
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "id": "webhook-trigger",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
+      "typeVersion": 1.1,
       "position": [240, 300]
     },
     {

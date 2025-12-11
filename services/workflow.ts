@@ -1,5 +1,6 @@
 // n8n Workflow Service for Email and AI Processing
-const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://kamesh14151.app.n8n.cloud/webhook/tomo-chat';
+// Use API proxy to avoid CORS issues
+const WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || '/api/workflow';
 
 // Generate session ID for workflow tracking
 const generateSessionId = (): string => {
@@ -30,25 +31,52 @@ export interface WorkflowResponse {
  */
 export const sendToWorkflow = async (message: string): Promise<WorkflowResponse> => {
   try {
+    console.log('Sending to workflow:', WEBHOOK_URL);
+    console.log('Payload:', { chatInput: message, sessionId, action: 'sendMessage' });
+    
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: message,
+        chatInput: message,
         sessionId: sessionId,
-        timestamp: new Date().toISOString(),
+        action: 'sendMessage'
       }),
     });
 
+    console.log('Response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`Workflow Error: Status ${response.status}`);
+      let errorMsg = `HTTP error! Status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.errorMessage || errorData.error || errorMsg;
+      } catch (e) {
+        // If we can't parse error response, use status message
+      }
+      throw new Error(errorMsg);
     }
 
-    const data = await response.json();
+    // Get raw response text first
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+    
+    if (!responseText || responseText.trim() === '') {
+      throw new Error('Empty response from workflow');
+    }
+    
+    // Parse JSON
+    const data = JSON.parse(responseText);
+    console.log('Parsed data:', data);
+    
+    // Handle different response formats
+    const responseMessage = data.output || data.message || data.response || data.aiResponse || 'Workflow completed successfully';
+    
     return {
-      response: data.response || data.aiResponse || 'Workflow completed successfully',
+      response: responseMessage,
       emailSent: data.emailSent,
       emailDetails: data.emailDetails,
     };
