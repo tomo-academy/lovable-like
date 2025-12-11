@@ -112,7 +112,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-white dark:bg-[#050505] selection:bg-pink-100 selection:text-pink-900 dark:selection:bg-pink-900/30 dark:selection:text-pink-100 flex transition-colors duration-300">
+    <div className="relative h-screen w-full overflow-hidden bg-white dark:bg-[#050505] selection:bg-pink-100 selection:text-pink-900 dark:selection:bg-pink-900/30 dark:selection:text-pink-100 flex transition-colors duration-300 touch-none">
       
       {/* Background Gradient Layer */}
       <div 
@@ -168,8 +168,8 @@ const App: React.FC = () => {
 
         <main className="flex-1 relative flex flex-col w-full overflow-hidden">
           {/* Chat Area - Scrollable */}
-          <div className={`flex-1 overflow-y-auto w-full scroll-smooth ${hasStarted ? 'pt-4 pb-4' : ''}`}>
-            <div className={`max-w-[90%] md:max-w-2xl mx-auto w-full ${hasStarted ? 'pb-[200px]' : ''}`}>
+          <div className={`flex-1 overflow-y-auto w-full scroll-smooth overscroll-contain ${hasStarted ? 'pt-2 sm:pt-4 pb-2 sm:pb-4' : ''}`}>
+            <div className={`max-w-[95%] sm:max-w-[90%] md:max-w-2xl mx-auto w-full ${hasStarted ? 'pb-[180px] sm:pb-[200px]' : ''}`}>
               {messages.map(msg => (
                 <ChatMessage key={msg.id} message={msg} />
               ))}
@@ -189,8 +189,8 @@ const App: React.FC = () => {
             className={`
               w-full flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]
               ${hasStarted 
-                ? 'absolute bottom-0 left-0 right-0 p-4 pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#050505] dark:via-[#050505]/80' 
-                : 'absolute top-[42%] md:top-[45%] left-0 right-0 -translate-y-1/2 px-4 z-20'}
+                ? 'fixed bottom-0 left-0 right-0 p-3 pb-4 sm:p-4 sm:pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#050505] dark:via-[#050505]/90' 
+                : 'absolute top-[45%] sm:top-[42%] md:top-[45%] left-0 right-0 -translate-y-1/2 px-3 sm:px-4 z-20'}
             `}
           >
             {/* Wrapper to re-enable pointer events for the input container */}
@@ -202,10 +202,10 @@ const App: React.FC = () => {
                {/* Hero Title */}
               <h1 
                 className={`
-                  text-center font-bold text-gray-900 dark:text-white mb-8 transition-all duration-500
+                  text-center font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 transition-all duration-500
                   ${hasStarted 
                     ? 'opacity-0 translate-y-4 pointer-events-none absolute' 
-                    : 'text-3xl md:text-[40px] opacity-100 translate-y-0 px-4 leading-tight tracking-tight drop-shadow-sm'}
+                    : 'text-2xl sm:text-3xl md:text-[40px] opacity-100 translate-y-0 px-3 sm:px-4 leading-tight tracking-tight drop-shadow-sm'}
                 `}
               >
                 Ready to build, Kamesh?
