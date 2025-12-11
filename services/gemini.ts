@@ -50,7 +50,29 @@ const isEmailRequest = (message: string): boolean => {
   return hasKeyword || hasEmailAddress;
 };
 
-export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid'): Promise<string> => {
+export interface EmailPreview {
+  recipient: string;
+  subject: string;
+  body: string;
+}
+
+export const sendEmailDirect = async (recipient: string, subject: string, body: string): Promise<string> => {
+  try {
+    const emailPrompt = `Send email to ${recipient} with subject ${subject}. ${body}`;
+    const workflowResponse = await sendToWorkflow(emailPrompt);
+    
+    if (workflowResponse.success) {
+      return `✅ Email sent successfully!\n\n📧 To: ${workflowResponse.recipient_email}\n📋 Subject: ${workflowResponse.subject}\n\nYour email has been delivered with beautiful HTML formatting.`;
+    }
+    
+    return workflowResponse.message;
+  } catch (error) {
+    console.error('Email sending error:', error);
+    return `${error instanceof Error ? error.message : '⚠️ Failed to send email'}`;
+  }
+};
+
+export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid'): Promise<string | { type: 'email_preview', data: EmailPreview }> => {
   try {
     // If mode is workflow only, always use workflow
     if (mode === 'workflow') {
@@ -88,22 +110,17 @@ export const sendMessageToGemini = async (prompt: string, mode: AIMode = 'hybrid
     const functionCall = response.functionCalls()?.[0];
     
     if (functionCall && functionCall.name === 'send_email' && mode === 'hybrid') {
-      try {
-        const { recipient, subject, body } = functionCall.args as { recipient: string; subject: string; body: string };
-        
-        // Call CodeWords API with natural language
-        const emailPrompt = `Send email to ${recipient} with subject ${subject}. ${body}`;
-        const workflowResponse = await sendToWorkflow(emailPrompt);
-        
-        if (workflowResponse.success) {
-          return `✅ Email sent successfully!\n\n📧 To: ${workflowResponse.recipient_email}\n📋 Subject: ${workflowResponse.subject}\n\nYour email has been delivered with beautiful HTML formatting.`;
+      const { recipient, subject, body } = functionCall.args as { recipient: string; subject: string; body: string };
+      
+      // Return email preview data instead of sending immediately
+      return {
+        type: 'email_preview',
+        data: {
+          recipient,
+          subject,
+          body
         }
-        
-        return workflowResponse.message;
-      } catch (error) {
-        console.error('Email sending error:', error);
-        return `${error instanceof Error ? error.message : '⚠️ Failed to send email'}`;
-      }
+      };
     }
     
     // Return regular text response

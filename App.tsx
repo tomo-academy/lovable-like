@@ -4,7 +4,8 @@ import { PromptInput } from './components/PromptInput';
 import { ChatMessage } from './components/ChatMessage';
 import { Sidebar } from './components/Sidebar';
 import { SettingsModal, Theme } from './components/SettingsModal';
-import { sendMessageToGemini, AIMode } from './services/gemini';
+import { EmailPreviewModal } from './components/EmailPreviewModal';
+import { sendMessageToGemini, sendEmailDirect, AIMode, EmailPreview } from './services/gemini';
 import { Message } from './types';import { TextShimmer } from './components/ui/text-shimmer';
 const App: React.FC = () => {
   const [aiMode, setAiMode] = useState<AIMode>('hybrid');
@@ -15,6 +16,8 @@ const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState('general');
   const [theme, setTheme] = useState<Theme>('system');
+  const [emailPreview, setEmailPreview] = useState<EmailPreview | null>(null);
+  const [isEmailPreviewOpen, setIsEmailPreviewOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Handle screen size for initial sidebar state
@@ -83,17 +86,64 @@ const App: React.FC = () => {
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    const aiResponseText = await sendMessageToGemini(text, aiMode);
+    const aiResponse = await sendMessageToGemini(text, aiMode);
+
+    // Check if response is email preview
+    if (typeof aiResponse === 'object' && aiResponse.type === 'email_preview') {
+      setEmailPreview(aiResponse.data);
+      setIsEmailPreviewOpen(true);
+      setIsLoading(false);
+      return;
+    }
 
     const aiMsg: Message = {
       id: (Date.now() + 1).toString(),
       role: 'model',
-      text: aiResponseText,
+      text: aiResponse as string,
       timestamp: Date.now(),
     };
 
     setMessages(prev => [...prev, aiMsg]);
     setIsLoading(false);
+  };
+
+  const handleConfirmEmail = async () => {
+    if (!emailPreview) return;
+
+    setIsEmailPreviewOpen(false);
+    setIsLoading(true);
+
+    const result = await sendEmailDirect(
+      emailPreview.recipient,
+      emailPreview.subject,
+      emailPreview.body
+    );
+
+    const aiMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'model',
+      text: result,
+      timestamp: Date.now(),
+    };
+
+    setMessages(prev => [...prev, aiMsg]);
+    setIsLoading(false);
+    setEmailPreview(null);
+  };
+
+  const handleCancelEmail = () => {
+    setIsEmailPreviewOpen(false);
+    setIsLoading(false);
+    
+    const aiMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'model',
+      text: '❌ Email sending cancelled. Let me know if you\'d like to send a different email or need help with something else!',
+      timestamp: Date.now(),
+    };
+
+    setMessages(prev => [...prev, aiMsg]);
+    setEmailPreview(null);
   };
 
   const handleNewChat = () => {
@@ -232,6 +282,16 @@ const App: React.FC = () => {
         theme={theme}
         onThemeChange={setTheme}
         initialTab={settingsTab}
+      />
+
+      {/* Email Preview Modal */}
+      <EmailPreviewModal
+        isOpen={isEmailPreviewOpen}
+        recipient={emailPreview?.recipient || ''}
+        subject={emailPreview?.subject || ''}
+        body={emailPreview?.body || ''}
+        onConfirm={handleConfirmEmail}
+        onCancel={handleCancelEmail}
       />
     </div>
   );
