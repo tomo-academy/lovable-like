@@ -25,14 +25,14 @@ const CodeBlock = ({ language, children }: CodeBlockProps) => {
   };
 
   return (
-    <div className="my-5 rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm bg-[#f6f8fa] dark:bg-[#0d1117] font-mono text-[13px]">
-      <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-white/5">
-        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 select-none">
+    <div className="my-5 rounded-xl overflow-hidden border border-gray-200/50 dark:border-white/10 shadow-sm bg-[#0d1117] font-mono text-[13px] group/code">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-b border-white/5">
+        <span className="text-xs font-semibold text-gray-400 select-none lowercase font-mono">
           {language || 'text'}
         </span>
         <button 
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10"
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors p-1.5 rounded-md hover:bg-white/5 opacity-0 group-hover/code:opacity-100 transition-opacity duration-200"
           title="Copy to clipboard"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -45,7 +45,7 @@ const CodeBlock = ({ language, children }: CodeBlockProps) => {
           style={atomDark}
           customStyle={{
             margin: 0,
-            padding: '1.25rem',
+            padding: '1.5rem',
             background: 'transparent',
             fontSize: '13px',
             fontFamily: '"JetBrains Mono", monospace',
@@ -53,6 +53,7 @@ const CodeBlock = ({ language, children }: CodeBlockProps) => {
           }}
           wrapLines={true}
           showLineNumbers={false}
+          PreTag="div"
         >
           {content}
         </SyntaxHighlighter>
@@ -65,7 +66,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === 'user';
 
   return (
-    <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-8 group`}>
+    <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-8 group animate-in fade-in slide-in-from-bottom-2 duration-300`}>
       <div className={`max-w-[90%] lg:max-w-[85%] ${isUser ? 'ml-auto' : 'mr-auto w-full'}`}>
         <div className={`
           rounded-2xl

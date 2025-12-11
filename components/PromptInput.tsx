@@ -1,11 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Paperclip, AudioLines, ArrowUp, MessageSquare, Image, Database, FileText, ChevronDown, Check, Briefcase, Sparkles, Code } from 'lucide-react';
+import { Plus, Paperclip, AudioLines, ArrowUp, MessageSquare, Image, Database, FileText, ChevronDown, Check, Briefcase, Sparkles, Code, Mic, MicOff } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 
 interface PromptInputProps {
   onSend: (text: string) => void;
   isLoading: boolean;
   isExpanded: boolean;
+}
+
+// Add type definition for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
 }
 
 const PREFIX = "Ask Lovable to ";
@@ -27,6 +35,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
   const [typingSuffix, setTypingSuffix] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Voice Input State
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -74,6 +86,63 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Voice Input Logic
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false; // Stop after one sentence
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setInput(prev => {
+          const trimmed = prev.trim();
+          return trimmed ? `${trimmed} ${finalTranscript}` : finalTranscript;
+        });
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+
   const handleSubmit = () => {
     if (input.trim() && !isLoading) {
       onSend(input);
@@ -115,7 +184,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={`${PREFIX}${typingSuffix}`}
+          placeholder={isListening ? "Listening..." : `${PREFIX}${typingSuffix}`}
           className="w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 text-[16px] md:text-[16px] placeholder-gray-400 dark:placeholder-gray-500 resize-none overflow-hidden min-h-[24px] py-1 px-2 leading-relaxed"
           rows={1}
         />
@@ -218,9 +287,17 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onSend, isLoading, isE
               <span className="hidden sm:inline">Chat</span>
             </button>
             
-            <Tooltip content="Voice Mode" position="top">
-              <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 transition-colors">
-                <AudioLines className="w-4 h-4" />
+            <Tooltip content={isListening ? "Stop listening" : "Voice Input"} position="top">
+              <button 
+                onClick={toggleListening}
+                className={`
+                  w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300
+                  ${isListening 
+                    ? 'bg-red-500 text-white animate-pulse' 
+                    : 'hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400'}
+                `}
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
             </Tooltip>
             
