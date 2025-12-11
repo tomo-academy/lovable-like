@@ -48,8 +48,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
       className={`relative flex items-center ${className}`}
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
-      onFocus={showTooltip}
-      onBlur={hideTooltip}
     >
       {children}
       {isVisible && (

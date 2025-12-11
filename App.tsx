@@ -164,8 +164,8 @@ const App: React.FC = () => {
 
         <main className="flex-1 relative flex flex-col w-full overflow-hidden">
           {/* Chat Area - Scrollable */}
-          <div className={`flex-1 overflow-y-auto w-full scroll-smooth ${hasStarted ? 'pt-4 pb-32 md:pb-40' : ''}`}>
-            <div className="max-w-4xl mx-auto w-full px-4 md:px-8 lg:px-12">
+          <div className={`flex-1 overflow-y-auto w-full scroll-smooth ${hasStarted ? 'pt-4 pb-4' : ''}`}>
+            <div className={`max-w-[90%] md:max-w-2xl mx-auto w-full ${hasStarted ? 'pb-[200px]' : ''}`}>
               {messages.map(msg => (
                 <ChatMessage key={msg.id} message={msg} />
               ))}
@@ -185,7 +185,7 @@ const App: React.FC = () => {
             className={`
               w-full flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]
               ${hasStarted 
-                ? 'absolute bottom-0 left-0 right-0 p-4 pb-6 md:pb-8 z-20 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#050505] dark:via-[#050505]/80' 
+                ? 'fixed bottom-0 left-0 right-0 p-4 pb-6 md:pb-8 z-20 pointer-events-none backdrop-blur-sm bg-white/80 dark:bg-[#050505]/80 border-t border-gray-200/50 dark:border-white/5' 
                 : 'absolute top-[42%] md:top-[45%] left-0 right-0 -translate-y-1/2 px-4 z-20'}
             `}
           >
