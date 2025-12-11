@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, FunctionDeclarationSchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { sendToWorkflow } from './workflow';
 
 const apiKey = import.meta.env.VITE_API_KEY || '';
@@ -11,18 +11,18 @@ const sendEmailFunction = {
   name: "send_email",
   description: "Send an email to a recipient with a subject and body. Use this when the user wants to send an email.",
   parameters: {
-    type: FunctionDeclarationSchemaType.OBJECT,
+    type: "OBJECT" as const,
     properties: {
       recipient: {
-        type: FunctionDeclarationSchemaType.STRING,
+        type: "STRING" as const,
         description: "The email address of the recipient",
       },
       subject: {
-        type: FunctionDeclarationSchemaType.STRING,
+        type: "STRING" as const,
         description: "The subject line of the email",
       },
       body: {
-        type: FunctionDeclarationSchemaType.STRING,
+        type: "STRING" as const,
         description: "The body content of the email",
       },
     },
