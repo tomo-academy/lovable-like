@@ -5,7 +5,7 @@ const ai = new GoogleGenerativeAI(apiKey);
 
 export const sendMessageToGemini = async (prompt: string): Promise<string> => {
   try {
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
     const response = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       systemInstruction: "You are Lovable, a helpful AI coding assistant. You are concise, friendly, and expert in React and web development. Answer requests as if you are about to build them.",
