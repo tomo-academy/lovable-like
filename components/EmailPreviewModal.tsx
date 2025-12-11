@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Mail, Send } from 'lucide-react';
 
 interface EmailPreviewModalProps {
@@ -6,7 +6,7 @@ interface EmailPreviewModalProps {
   recipient: string;
   subject: string;
   body: string;
-  onConfirm: () => void;
+  onConfirm: (recipient: string, subject: string, body: string) => void;
   onCancel: () => void;
 }
 
@@ -18,7 +18,23 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const [editedRecipient, setEditedRecipient] = useState(recipient);
+  const [editedSubject, setEditedSubject] = useState(subject);
+  const [editedBody, setEditedBody] = useState(body);
+
+  useEffect(() => {
+    if (isOpen) {
+      setEditedRecipient(recipient);
+      setEditedSubject(subject);
+      setEditedBody(body);
+    }
+  }, [isOpen, recipient, subject, body]);
+
   if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    onConfirm(editedRecipient, editedSubject, editedBody);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -50,9 +66,13 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               To:
             </label>
-            <div className="px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-              <p className="text-gray-900 dark:text-white font-medium">{recipient}</p>
-            </div>
+            <input
+              type="email"
+              value={editedRecipient}
+              onChange={(e) => setEditedRecipient(e.target.value)}
+              className="w-full px-4 py-3 bg-white dark:bg-[#18181b] rounded-lg border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+              placeholder="recipient@example.com"
+            />
           </div>
 
           {/* Subject */}
@@ -60,9 +80,13 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Subject:
             </label>
-            <div className="px-4 py-3 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-              <p className="text-gray-900 dark:text-white font-medium">{subject}</p>
-            </div>
+            <input
+              type="text"
+              value={editedSubject}
+              onChange={(e) => setEditedSubject(e.target.value)}
+              className="w-full px-4 py-3 bg-white dark:bg-[#18181b] rounded-lg border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+              placeholder="Email subject"
+            />
           </div>
 
           {/* Body */}
@@ -70,11 +94,13 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Message:
             </label>
-            <div className="px-4 py-4 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-              <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
-                {body}
-              </p>
-            </div>
+            <textarea
+              value={editedBody}
+              onChange={(e) => setEditedBody(e.target.value)}
+              rows={8}
+              className="w-full px-4 py-4 bg-white dark:bg-[#18181b] rounded-lg border border-gray-300 dark:border-white/20 text-gray-800 dark:text-gray-200 leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+              placeholder="Email body content..."
+            />
           </div>
         </div>
 
@@ -87,8 +113,9 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
             Cancel
           </button>
           <button
-            onClick={onConfirm}
-            className="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition-colors font-medium flex items-center gap-2 shadow-lg shadow-pink-500/25"
+            onClick={handleConfirm}
+            disabled={!editedRecipient || !editedSubject || !editedBody}
+            className="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium flex items-center gap-2 shadow-lg shadow-pink-500/25 disabled:shadow-none"
           >
             <Send className="w-4 h-4" />
             Send Email

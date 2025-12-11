@@ -107,17 +107,11 @@ const App: React.FC = () => {
     setIsLoading(false);
   };
 
-  const handleConfirmEmail = async () => {
-    if (!emailPreview) return;
-
+  const handleConfirmEmail = async (recipient: string, subject: string, body: string) => {
     setIsEmailPreviewOpen(false);
     setIsLoading(true);
 
-    const result = await sendEmailDirect(
-      emailPreview.recipient,
-      emailPreview.subject,
-      emailPreview.body
-    );
+    const result = await sendEmailDirect(recipient, subject, body);
 
     const aiMsg: Message = {
       id: (Date.now() + 1).toString(),
